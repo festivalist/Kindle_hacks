@@ -14,8 +14,7 @@
     - my used version: here: https://storage.gra.cloud.ovh.net/v1/AUTH_2ac4bfee353948ec8ea7fd1710574097/mr-public/KUAL/kual-mrinstaller-1.7.N-r19303.tar.xz
   - KUAL (Coplate/Booklet Version):
     - Funktion: Das grafische Menü zum Starten von Apps. Für FW > 5.5 wird die Booklet-Version benötigt.
-    - [Link: KUAL-v2.7.36-g6136d8e-20240401.tar.xz](https://storage.gra.cloud.ovh.net/v1/AUTH_2ac4bfee353948ec8ea7fd1710574097/mr-public/KUAL/KUAL-v2.7.37-gfcb45b5-20250419.tar.xz)
-    - 
+    - [Link: KUAL-v2.7.36-g6136d8e-20240401.tar.xz](https://storage.gra.cloud.ovh.net/v1/AUTH_2ac4bfee353948ec8ea7fd1710574097/mr-public/KUAL/KUAL-v2.7.37-gfcb45b5-20250419.tar.xz)     - 
 
 ### Schritt 2: Dateien auf den Kindle übertragen
 - Verbinden Sie den Kindle per USB mit dem PC.
@@ -39,3 +38,51 @@
 - In Ihrer Bibliothek sollte nun ein neues "Buch" namens KUAL erscheinen.
 - Öffnen Sie KUAL. Wenn das Menü geladen wird, war die Installation erfolgreich.
 - Sie können nun weitere Erweiterungen (z. B. KOReader) installieren, indem Sie deren .bin-Dateien in den Ordner mrpackages legen und erneut ;log mrpi ausführen.
+
+## install custom screensavers with "linkss"
+#### Ziel ist die letzte web browser seite als sreensaver anzuzeigen
+- Spart akku und passt sich ständing an.
+- Macht 5 minuten nach letztem aufwachen einen screenshot und nimmt den als screensaver
+- Create this folder on the Kindle: `/scripts`
+- Inside create the file: `wake_screenshot.sh`
+- Paste this script:
+```
+#!/bin/sh
+
+TARGET="/mnt/us/linkss/screensavers/browser.png"
+
+while true
+do
+    lipc-wait-event com.lab126.powerd wakeUp
+
+    # wait 5 minutes
+    sleep 300
+
+    # capture the screen
+    fbgrab $TARGET
+done
+```
+- Now create another file in the same folder: `run.sh`
+- Put this inside:
+```
+#!/bin/sh
+
+chmod +x /mnt/us/scripts/wake_screenshot.sh
+/mnt/us/scripts/wake_screenshot.sh &
+```
+- We will use the linkss startup hook (this works with the screensaver hack)
+- Open this folder: `/linkss`
+- Create a file: `auto`
+- Put this inside:
+```
+/mnt/us/scripts/run.sh &
+```
+- Restart the Kindle
+- How it works
+  - Example usage:
+  - Wake Kindle
+  - Open browser page
+  - Leave Kindle on that page
+  - After 5 minutes, the script runs: `fbgrab`
+  - Screenshot saved as: `/linkss/screensavers/browser.png`
+  - When Kindle sleeps → that image becomes the screensaver.
